@@ -1,0 +1,62 @@
+--- UOJ-System/web/app/controllers/judge/submit.php	2022-12-30 09:54:05.452022649 +0800
++++ UOJ-Luogu-RemoteJudge/web/app/controllers/judge/submit.php	2023-03-19 21:47:57.347852462 +0800
+@@ -85,7 +85,7 @@
+ 				if (validateUploadedFile('hack_input') && validateUploadedFile('std_output')) {
+ 					dataAddExtraTest(queryProblemBrief($problem_id), $_FILES["hack_input"]["tmp_name"], $_FILES["std_output"]["tmp_name"]);
+ 				} else {
+-					error_log("hack successfully but received no data. id: ${_POST['id']}");
++					error_log("hack successfully but received no data. id: {$_POST['id']}");
+ 				}
+ 			}
+ 		}
+@@ -115,12 +115,26 @@
+ 		}
+ 		die();
+ 	}
++
++    $problem_ban_list = array();
++
++    if ($_POST['judger_name'] == "luogu_remote_judger") {
++        $problem_ban_list = array_map(function ($x) { return $x['id']; }, DB::selectAll("select id from problems where type != 'luogu'"));
++    } else {
++        $problem_ban_list = array_map(function ($x) { return $x['id']; }, DB::selectAll("select id from problems where type != 'local'"));
++    }
++
++    $conds = " (true) ";
++
++    if (!empty($problem_ban_list)) {
++        $conds .= " and problem_id not in (" . implode(",", $problem_ban_list) . ") ";
++    }
+ 	
+ 	$submission = null;
+ 	$hack = null;
+ 	function querySubmissionToJudge($status, $set_q) {
+-		global $submission;
+-		$submission = DB::selectFirst("select id, problem_id, content from submissions where status = '$status' order by id limit 1");
++		global $submission, $conds;
++		$submission = DB::selectFirst("select id, problem_id, content from submissions where status = '$status' and $conds order by id limit 1");
+ 		if ($submission) {
+ 			DB::update("update submissions set $set_q where id = {$submission['id']} and status = '$status'");
+ 			if (DB::affected_rows() != 1) {
+@@ -129,8 +143,8 @@
+ 		}
+ 	}
+ 	function queryCustomTestSubmissionToJudge() {
+-		global $submission;
+-		$submission = DB::selectFirst("select id, problem_id, content from custom_test_submissions where judge_time is null order by id limit 1");
++		global $submission, $conds;
++		$submission = DB::selectFirst("select id, problem_id, content from custom_test_submissions where judge_time is null and $conds order by id limit 1");
+ 		if ($submission) {
+ 			DB::update("update custom_test_submissions set judge_time = now(), status = 'Judging' where id = {$submission['id']} and judge_time is null");
+ 			if (DB::affected_rows() != 1) {
+@@ -142,8 +156,8 @@
+ 		}
+ 	}
+ 	function queryHackToJudge() {
+-		global $hack;
+-		$hack = DB::selectFirst("select id, submission_id, input, input_type from hacks where judge_time is null order by id limit 1");
++		global $hack, $conds;
++		$hack = DB::selectFirst("select id, submission_id, input, input_type from hacks where judge_time is null and $conds order by id limit 1");
+ 		if ($hack) {
+ 			DB::update("update hacks set judge_time = now() where id = {$hack['id']} and judge_time is null");
+ 			if (DB::affected_rows() != 1) {
