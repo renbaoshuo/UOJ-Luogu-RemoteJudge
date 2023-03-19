@@ -1,12 +1,14 @@
 <?php
 
+// requires uoj-data-lib
+
 define('LUOGU_BASE_URL', 'https://www.luogu.com.cn');
 define('LUOGU_API_BASEURL', 'https://open-v1.lgapi.cn');
-define('LUOGU_SUPPORTED_LANGUAGES', ['C', 'C++', 'C++11', 'Java8', 'Pascal', 'Python2', 'Python3']);
+define('LUOGU_SUPPORTED_LANGUAGES', array('C', 'C++', 'C++11', 'Java8', 'Pascal', 'Python2', 'Python3'));
 define('LUOGU_USER_AGENT', 'UniversalOJ/1.0 UOJ-Luogu-RemoteJudge/1.0 ( https://github.com/renbaoshuo/UOJ-Luogu-RemoteJudge )');
 
 function parseLuoguProblemData($problem) {
-    if (!$problem) return null;
+    if (!$problem) throw new Exception('Problem not found');
 
     $statement = '';
 
@@ -73,4 +75,34 @@ function fetchLuoguProblemBasicInfo($pid) {
     $data = json_decode($curl->data(), true);
 
     return parseLuoguProblemData($data['currentData']['problem']);
+}
+
+function newLuoguRemoteProblem($pid) {
+    // ensure validateLuoguProblemId($pid) is true
+
+    $problem = fetchLuoguProblemBasicInfo($pid);
+
+    $esc_submission_requirements = json_encode(array(
+        array(
+            "name" => "answer",
+            "type" => "source code",
+            "file_name" => "answer.code",
+            "languages" => LUOGU_SUPPORTED_LANGUAGES,
+        ),
+    ));
+    $esc_extra_config = json_encode(array(
+        "luogu_pid" => $pid,
+        "view_content_type" => "ALL",
+        "view_details_type" => "ALL",
+    ));
+
+    DB::query("insert into problems (title, is_hidden, submission_requirement, extra_config, hackable, type) values ('" . DB::escape($problem['title']) . "', 1, '" . DB::escape($esc_submission_requirements) . "', '" . DB::escape($esc_extra_config) . "', 0, 'luogu')");
+
+    $id = DB::insert_id();
+
+    DB::query("insert into problems_contents (id, statement, statement_md) values ($id, '" . DB::escape($problem['statement']) . "', '" . DB::escape($problem['statement_md']) . "')");
+
+    dataNewProblem($id);
+
+    return $id;
 }
