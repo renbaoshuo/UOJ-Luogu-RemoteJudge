@@ -49,6 +49,7 @@ function parseLuoguProblemData($problem) {
         'time_limit' => (float)max($problem['limits']['time']) / 1000.0,
         'memory_limit' => (float)max($problem['limits']['memory']) / 1024.0,
         'statement' => renderMarkdown($statement),
+        'statement_md' => $statement,
     ];
 }
 
