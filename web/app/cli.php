@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
+
 $_SERVER['DOCUMENT_ROOT'] = dirname(__DIR__);
 
 require $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-lib.php';
