@@ -62,7 +62,6 @@ function fetchLuoguProblemBasicInfo($pid) {
 
     $curl->set('CURLOPT_HTTPHEADER', [
         'User-Agent: ' . LUOGU_USER_AGENT,
-        'Content-Type: application/json',
         'Accept: application/json',
     ]);
 
@@ -92,17 +91,44 @@ function newLuoguRemoteProblem($pid) {
     ));
     $esc_extra_config = json_encode(array(
         "luogu_pid" => $pid,
+        "time_limit" => $problem['time_limit'],
+        "memory_limit" => $problem['memory_limit'],
         "view_content_type" => "ALL",
         "view_details_type" => "ALL",
     ));
 
-    DB::query("insert into problems (title, is_hidden, submission_requirement, extra_config, hackable, type) values ('" . DB::escape($problem['title']) . "', 1, '" . DB::escape($esc_submission_requirements) . "', '" . DB::escape($esc_extra_config) . "', 0, 'luogu')");
+    DB::insert("insert into problems (title, is_hidden, submission_requirement, extra_config, hackable, type) values ('" . DB::escape($problem['title']) . "', 1, '" . DB::escape($esc_submission_requirements) . "', '" . DB::escape($esc_extra_config) . "', 0, 'luogu')");
 
     $id = DB::insert_id();
 
-    DB::query("insert into problems_contents (id, statement, statement_md) values ($id, '" . DB::escape($problem['statement']) . "', '" . DB::escape($problem['statement_md']) . "')");
+    DB::insert("insert into problems_contents (id, statement, statement_md) values ($id, '" . DB::escape($problem['statement']) . "', '" . DB::escape($problem['statement_md']) . "')");
 
     dataNewProblem($id);
 
     return $id;
+}
+
+function refetchLuoguProblemInfo($id) {
+    $problem = queryProblemBrief($id);
+    $problem_extra_config = getProblemExtraConfig($problem);
+    $pid = $problem_extra_config['luogu_pid'];
+
+    $luogu_problem = fetchLuoguProblemBasicInfo($pid);
+
+    $esc_submission_requirements = json_encode(array(
+        array(
+            "name" => "answer",
+            "type" => "source code",
+            "file_name" => "answer.code",
+            "languages" => LUOGU_SUPPORTED_LANGUAGES,
+        ),
+    ));
+    mergeConfig($problem_extra_config, array(
+        "time_limit" => $luogu_problem['time_limit'],
+        "memory_limit" => $luogu_problem['memory_limit'],
+    ));
+    $esc_extra_config = json_encode($problem_extra_config);
+
+    DB::update("update problems set title = '" . DB::escape($luogu_problem['title']) . "', submission_requirement = '" . DB::escape($esc_submission_requirements) . "', extra_config = '" . DB::escape($esc_extra_config) . "' where id = {$problem['id']}");
+    DB::update("update problems_contents set statement = '" . DB::escape($luogu_problem['statement']) . "', statement_md = '" . DB::escape($luogu_problem['statement_md']) . "' where id = {$problem['id']}");
 }

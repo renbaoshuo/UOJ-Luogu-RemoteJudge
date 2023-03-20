@@ -1,0 +1,57 @@
+--- UOJ-System/web/app/controllers/problem_set.php	2023-03-19 21:20:30.679254485 +0800
++++ UOJ-Luogu-RemoteJudge/web/app/controllers/problem_set.php	2023-03-20 14:43:44.884987235 +0800
+@@ -2,6 +2,7 @@
+ 	requirePHPLib('form');
+ 	requirePHPLib('judger');
+ 	requirePHPLib('data');
++	requirePHPLib('luogu');
+ 	
+ 	if (isSuperUser($myUser)) {
+ 		$new_problem_form = new UOJForm('new_problem');
+@@ -15,8 +16,28 @@
+ 		$new_problem_form->submit_button_config['class_str'] = 'btn btn-primary';
+ 		$new_problem_form->submit_button_config['text'] = UOJLocale::get('problems::add new');
+ 		$new_problem_form->submit_button_config['smart_confirm'] = '';
+-		
+ 		$new_problem_form->runAtServer();
++
++		$new_luogu_problem_form = new UOJForm('new_luogu_problem');
++		$new_luogu_problem_form->addVInput('luogu_pid', 'text', '洛谷题号', '', function($id) {
++			if (!validateLuoguProblemId($id)) {
++				return '题目 ID 不合法';
++			}
++
++			return '';
++		}, null);
++		$new_luogu_problem_form->handle = function() {
++			try {
++				newLuoguRemoteProblem($_POST['luogu_pid']);
++			} catch (Exception $e) {
++				becomeMsgPage('<h2>添加失败</h2><pre>' . $e->getMessage() . '</pre>');
++			}
++		};
++		// $new_luogu_problem_form->submit_button_config['align'] = 'right';
++		$new_luogu_problem_form->submit_button_config['class_str'] = 'btn btn-primary';
++		$new_luogu_problem_form->submit_button_config['text'] = UOJLocale::get('problems::add new');
++		$new_luogu_problem_form->submit_button_config['confirm'] = '新增来自洛谷的题目';
++		$new_luogu_problem_form->runAtServer();
+ 	}
+ 	
+ 	function echoProblem($problem) {
+@@ -186,7 +207,16 @@
+ 	echo '</div>';
+ 	
+ 	if (isSuperUser($myUser)) {
++		echo '<div class="top-buffer-sm"></div>';
+ 		$new_problem_form->printHTML();
++
++		echo '<div class="top-buffer-sm"></div>';
++		echo 	'<div class="card" style="max-width: 300px">';
++		echo 		'<div class="card-body">';
++		$new_luogu_problem_form->printHTML();
++		echo 		'</div>';
++		echo 	'</div>';
++		echo '</div>';
+ 	}
+ 	
+ 	echo $pag->pagination();

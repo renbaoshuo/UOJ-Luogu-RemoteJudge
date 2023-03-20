@@ -1,0 +1,17 @@
+--- UOJ-System/web/app/controllers/problem.php	2022-12-30 09:54:05.452022649 +0800
++++ UOJ-Luogu-RemoteJudge/web/app/controllers/problem.php	2023-03-20 15:01:32.363789172 +0800
+@@ -208,9 +208,14 @@
+ ?>
+ <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
+ <?php
++if ($problem['type'] == 'luogu') {
++	$time_limit = $problem_extra_config['time_limit'];
++	$memory_limit = $problem_extra_config['memory_limit'];
++} else {
+ 	$limit = getUOJConf("/var/uoj_data/{$problem['id']}/problem.conf");
+ 	$time_limit = $limit['time_limit'];
+ 	$memory_limit = $limit['memory_limit'];
++}
+ ?>
+ <div class="row d-flex justify-content-center">
+ 	<span class="badge badge-secondary mr-1">时间限制:<?=$time_limit!=null?"$time_limit s":"N/A"?></span>

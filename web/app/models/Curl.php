@@ -3,8 +3,6 @@
 // from https://github.com/wenpeng/curl
 // requires php-curl module
 
-use Exception;
-
 class Curl {
     private $post;
     private $retry = 0;

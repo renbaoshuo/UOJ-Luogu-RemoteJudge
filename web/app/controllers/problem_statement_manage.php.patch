@@ -1,0 +1,40 @@
+--- UOJ-System/web/app/controllers/problem_statement_manage.php	2023-03-19 21:20:30.679254485 +0800
++++ UOJ-Luogu-RemoteJudge/web/app/controllers/problem_statement_manage.php	2023-03-20 15:02:04.084987421 +0800
+@@ -1,5 +1,7 @@
+ <?php
+ 	requirePHPLib('form');
++	requirePHPLib('data');
++	requirePHPLib('luogu');
+ 	
+ 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
+ 		become404Page();
+@@ -45,6 +47,21 @@
+ 	};
+ 	
+ 	$problem_editor->runAtServer();
++
++	if ($problem['type'] == 'luogu') {
++		$refetch_problem_form = new UOJForm('refetch_luogu');
++		$refetch_problem_form->submit_button_config['align'] = 'left';
++		$refetch_problem_form->submit_button_config['class_str'] = 'btn btn-danger';
++		$refetch_problem_form->submit_button_config['text'] = '重新拉取题目';
++		$refetch_problem_form->handle = function() use ($problem) {
++			try {
++				refetchLuoguProblemInfo($problem['id']);
++			} catch (Exception $e) {
++				becomeMsgPage('<h2>拉取失败</h2><pre>' . $e->getMessage() . '</pre>');
++			}
++		};
++		$refetch_problem_form->runAtServer();
++	}
+ ?>
+ <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 编辑 - 题目管理') ?>
+ <h1 class="page-header" align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
+@@ -55,4 +72,7 @@
+ 	<li class="nav-item"><a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">返回</a></li>
+ </ul>
+ <?php $problem_editor->printHTML() ?>
++<?php if (isset($refetch_problem_form)): ?>
++	<?php $refetch_problem_form->printHTML() ?>
++<?php endif ?>
+ <?php echoUOJPageFooter() ?>
