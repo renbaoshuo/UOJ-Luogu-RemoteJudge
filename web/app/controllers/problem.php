@@ -84,9 +84,16 @@
 	}
 	
 	function handleUpload($zip_file_name, $content, $tot_size) {
-		global $problem, $contest, $myUser, $is_in_contest;
+		global $problem, $contest, $myUser, $is_in_contest, $problem_extra_config;
 		
 		$content['config'][] = array('problem_id', $problem['id']);
+		if ($problem['type'] != 'local') {
+			$content['config'][] = array('problem_type', $problem['type']);
+			
+			if ($problem['type'] == 'luogu') {
+				$content['config'][] = array('luogu_pid', $problem_extra_config['luogu_pid']);
+			}
+		}
 		if ($is_in_contest && $contest['extra_config']["contest_type"]!='IOI' && !isset($contest['extra_config']["problem_{$problem['id']}"])) {
 			$content['final_test_config'] = $content['config'];
 			$content['config'][] = array('test_sample_only', 'on');

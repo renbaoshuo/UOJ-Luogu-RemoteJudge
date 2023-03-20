@@ -1,6 +1,24 @@
 --- UOJ-System/web/app/controllers/problem.php	2022-12-30 09:54:05.452022649 +0800
-+++ UOJ-Luogu-RemoteJudge/web/app/controllers/problem.php	2023-03-20 15:01:32.363789172 +0800
-@@ -208,9 +208,14 @@
++++ UOJ-Luogu-RemoteJudge/web/app/controllers/problem.php	2023-03-20 18:35:07.026275519 +0800
+@@ -84,9 +84,16 @@
+ 	}
+ 	
+ 	function handleUpload($zip_file_name, $content, $tot_size) {
+-		global $problem, $contest, $myUser, $is_in_contest;
++		global $problem, $contest, $myUser, $is_in_contest, $problem_extra_config;
+ 		
+ 		$content['config'][] = array('problem_id', $problem['id']);
++		if ($problem['type'] != 'local') {
++			$content['config'][] = array('problem_type', $problem['type']);
++			
++			if ($problem['type'] == 'luogu') {
++				$content['config'][] = array('luogu_pid', $problem_extra_config['luogu_pid']);
++			}
++		}
+ 		if ($is_in_contest && $contest['extra_config']["contest_type"]!='IOI' && !isset($contest['extra_config']["problem_{$problem['id']}"])) {
+ 			$content['final_test_config'] = $content['config'];
+ 			$content['config'][] = array('test_sample_only', 'on');
+@@ -208,9 +215,14 @@
  ?>
  <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
  <?php
