@@ -4,7 +4,7 @@
 
 define('LUOGU_BASE_URL', 'https://www.luogu.com.cn');
 define('LUOGU_API_BASEURL', 'https://open-v1.lgapi.cn');
-define('LUOGU_SUPPORTED_LANGUAGES', array('C', 'C++', 'C++11', 'Java8', 'Pascal', 'Python2', 'Python3'));
+define('LUOGU_SUPPORTED_LANGUAGES', array('C', 'C++', 'C++11', 'Java8', 'Pascal', 'Python3'));
 define('LUOGU_USER_AGENT', 'UniversalOJ/1.0 UOJ-Luogu-RemoteJudge/1.0 ( https://github.com/renbaoshuo/UOJ-Luogu-RemoteJudge )');
 
 function parseLuoguProblemData($problem) {
