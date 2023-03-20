@@ -77,11 +77,7 @@ function fetchLuoguProblemBasicInfo($pid) {
     return parseLuoguProblemData($data['currentData']['problem']);
 }
 
-function newLuoguRemoteProblem($pid) {
-    // ensure validateLuoguProblemId($pid) is true
-
-    $problem = fetchLuoguProblemBasicInfo($pid);
-
+function newLuoguRemoteProblemFromData($problem) {
     $esc_submission_requirements = json_encode(array(
         array(
             "name" => "answer",
@@ -98,13 +94,22 @@ function newLuoguRemoteProblem($pid) {
         "view_details_type" => "ALL",
     ));
 
-    DB::insert("insert into problems (title, is_hidden, submission_requirement, extra_config, hackable, type) values ('" . DB::escape($problem['title']) . "', 1, '" . DB::escape($esc_submission_requirements) . "', '" . DB::escape($esc_extra_config) . "', 0, 'luogu')");
+    DB::insert("insert into problems (title, is_hidden, submission_requirement, extra_config, hackable, type) values ('" . DB::escape($problem['title']) . "', 1, '" . DB::escape($esc_submission_requirements) . "', '" . DB::escape($esc_extra_config) . "', 0, 'luogu')") or die(mysqli_error($GLOBALS['uojMySQL']) . "\n");
 
     $id = DB::insert_id();
 
     DB::insert("insert into problems_contents (id, statement, statement_md) values ($id, '" . DB::escape($problem['statement']) . "', '" . DB::escape($problem['statement_md']) . "')");
 
     dataNewProblem($id);
+
+    return $id;
+}
+
+function newLuoguRemoteProblem($pid) {
+    // ensure validateLuoguProblemId($pid) is true
+
+    $problem = fetchLuoguProblemBasicInfo($pid);
+    $id = newLuoguRemoteProblemFromData($problem);
 
     return $id;
 }

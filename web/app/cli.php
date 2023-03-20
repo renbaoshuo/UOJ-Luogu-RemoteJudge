@@ -8,6 +8,15 @@ requirePHPLib('luogu');
 requirePHPLib('data');
 
 // TODO: more beautiful argv parser
+$my_args = array();
+
+for ($i = 1; $i < count($argv); $i++) {
+    if (preg_match('/^--([^=]+)[=](.*)/', $argv[$i], $match)) {
+        $my_args[$match[1]] = $match[2];
+    } else if (preg_match('/^--(.*)/', $argv[$i], $match)) {
+        $my_args[$match[1]] = $argv[++$i];
+    }
+}
 
 $handlers = [
 	'upgrade:up' => function ($name) {
@@ -64,18 +73,32 @@ $handlers = [
 		});
 		die("finished!\n");
 	},
-	'luogu:add-problem' => function () use ($argv) {
-		$rest_index = null;
-		$opts = getopt('', ['file::'], $rest_index);
+	'luogu:add-problem' => function () use ($argv, $my_args) {
+		DB::init();
 
-		if (!isset($opts['file'])) {
+		$db = array();
+
+		if (!isset($my_args['file'])) {
 			echo "No database file specified, fetching online instead.\n\n";
+		} else {
+			echo "Reading local database: {$my_args['file']}\n\n";
+
+			$file = file_get_contents($my_args['file']);
+
+			foreach (explode("\n", $file) as $line) {
+				if (strlen($line) == 0) continue;
+
+				$line_data = json_decode($line, true);
+				$db[$line_data['pid']] = $line_data;
+			}
+
+			$db_count = count($db);
+			echo "Loaded {$db_count} items.\n\n";
 		}
 
 		// TODO: read database from local file
 
-		$problems = array_slice($argv, $rest_index);
-		$problems = array_filter($problems, function ($id) {
+		$problems = array_filter($argv, function ($id) {
 			if (!validateLuoguProblemId($id)) return false;
 
 			return true;
@@ -93,7 +116,16 @@ $handlers = [
 
 		foreach ($problems as $pid) {
 			try {
-				$id = newLuoguRemoteProblem($pid);
+				if (!isset($db[$pid])) {
+					if (!empty($db)) {
+						echo "[WARN] $pid: fallback to fetch data online\n";
+					}
+
+					$id = newLuoguRemoteProblem($pid);
+				} else {
+					$parsed = parseLuoguProblemData($db[$pid]);
+					$id = newLuoguRemoteProblemFromData($parsed);
+				}
 
 				echo "$pid: $id\n";
 			} catch (Exception $e) {
