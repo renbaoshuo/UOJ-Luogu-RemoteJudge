@@ -1,0 +1,58 @@
+--- UOJ-System/web/app/cli.php	2022-12-30 09:54:05.452022649 +0800
++++ UOJ-Luogu-RemoteJudge/web/app/cli.php	2023-03-20 16:47:12.734169684 +0800
+@@ -4,6 +4,9 @@
+ 
+ require $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-lib.php';
+ 
++requirePHPLib('luogu');
++requirePHPLib('data');
++
+ // TODO: more beautiful argv parser
+ 
+ $handlers = [
+@@ -61,7 +64,44 @@
+ 		});
+ 		die("finished!\n");
+ 	},
+-	'help' => 'showHelp'
++	'luogu:add-problem' => function () use ($argv) {
++		$rest_index = null;
++		$opts = getopt('', ['file::'], $rest_index);
++
++		if (!isset($opts['file'])) {
++			echo "No database file specified, fetching online instead.\n\n";
++		}
++
++		// TODO: read database from local file
++
++		$problems = array_slice($argv, $rest_index);
++		$problems = array_filter($problems, function ($id) {
++			if (!validateLuoguProblemId($id)) return false;
++
++			return true;
++		});
++
++		if (empty($problems)) {
++			echo "No problems to be added.\n";
++
++			return;
++		}
++
++		echo "Problems to be added: " . implode(', ', $problems) . "\n\n";
++
++		readline("Press Enter to continue, or Ctrl+C to abort.");
++
++		foreach ($problems as $pid) {
++			try {
++				$id = newLuoguRemoteProblem($pid);
++
++				echo "$pid: $id\n";
++			} catch (Exception $e) {
++				echo "$pid: failed\n";
++			}
++		}
++	},
++	'help' => 'showHelp',
+ ];
+ 
+ function showHelp() {

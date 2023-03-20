@@ -47,6 +47,7 @@ function parseLuoguProblemData($problem) {
     $statement .= $problem['hint'] . "\n";
 
     return [
+        'pid' => $problem['pid'],
         'title' => "【洛谷 {$problem['pid']}】{$problem['title']}",
         'time_limit' => (float)max($problem['limits']['time']) / 1000.0,
         'memory_limit' => (float)max($problem['limits']['memory']) / 1024.0,
@@ -90,7 +91,7 @@ function newLuoguRemoteProblem($pid) {
         ),
     ));
     $esc_extra_config = json_encode(array(
-        "luogu_pid" => $pid,
+        "luogu_pid" => $problem['pid'],
         "time_limit" => $problem['time_limit'],
         "memory_limit" => $problem['memory_limit'],
         "view_content_type" => "ALL",
