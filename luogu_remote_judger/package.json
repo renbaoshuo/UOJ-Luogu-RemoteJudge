@@ -1,0 +1,25 @@
+{
+  "name": "s2oj-luogu-remote-judger",
+  "version": "0.0.0",
+  "description": "Luogu remote judger for S2OJ.",
+  "private": true,
+  "main": "entrypoint.js",
+  "type": "module",
+  "scripts": {
+    "start": "node entrypoint.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renbaoshuo/S2OJ.git"
+  },
+  "author": "Baoshuo <i@baoshuo.ren>",
+  "bugs": {
+    "url": "https://github.com/renbaoshuo/S2OJ/issues"
+  },
+  "homepage": "https://github.com/renbaoshuo/S2OJ#readme",
+  "dependencies": {
+    "fs-extra": "^11.1.1",
+    "reggol": "^1.3.5",
+    "superagent": "^8.0.9"
+  }
+}
