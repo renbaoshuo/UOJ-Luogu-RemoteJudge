@@ -1,6 +1,6 @@
 {
   "name": "s2oj-luogu-remote-judger",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Luogu remote judger for S2OJ.",
   "private": true,
   "main": "entrypoint.js",
