@@ -191,7 +191,7 @@ export default class Luogu {
             message: `[Luogu] ${HTTP_ERROR_MAP[result.status]}.`,
           });
 
-          logger.error('submitProblem', result.status, HTTP_ERROR_MAP[result.status]);
+          logger.error('waitForSubmission', result.status, HTTP_ERROR_MAP[result.status]);
 
           return null;
         }
