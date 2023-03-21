@@ -182,7 +182,7 @@ export default class Luogu {
       count++;
 
       try {
-        const result = await this.get(`/judge/result?id=${id}`);
+        const result = await this.get(`/judge/result?id=${id}`).ok((status) => true);
 
         if (HTTP_ERROR_MAP[result.status]) {
           await end({
