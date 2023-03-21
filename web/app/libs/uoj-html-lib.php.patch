@@ -1,0 +1,23 @@
+--- UOJ-System/web/app/libs/uoj-html-lib.php	2022-12-30 09:54:05.452022649 +0800
++++ UOJ-Luogu-RemoteJudge/web/app/libs/uoj-html-lib.php	2023-03-21 21:22:31.783213786 +0800
+@@ -989,3 +989,20 @@
+ 	$config['get_row_index'] = '';
+ 	echoLongTable($col_names, 'user_info', '1', $tail, $header_row, $print_row, $config);
+ }
++
++function renderMarkdown($content_md) {
++    $purifier = HTML::pruifier();
++
++    try {
++        $v8 = new V8Js();
++        $v8->content_md = $content_md;
++        $v8->executeString(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/js/marked.js'), 'marked.js');
++        $content = $v8->executeString('marked(PHP.content_md)');
++    } catch (V8JsException $e) {
++        throw new Exception('V8Js error: ' . $e->getMessage());
++    }
++
++    $content = $purifier->purify($content);
++
++    return $content;
++}

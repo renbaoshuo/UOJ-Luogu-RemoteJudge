@@ -1,0 +1,10 @@
+--- UOJ-System/web/app/libs/uoj-validate-lib.php	2022-12-30 09:54:05.452022649 +0800
++++ UOJ-Luogu-RemoteJudge/web/app/libs/uoj-validate-lib.php	2023-03-21 21:23:42.635610391 +0800
+@@ -47,3 +47,7 @@
+ function validateIP($ip) {
+ 	return filter_var($ip, FILTER_VALIDATE_IP) !== false;
+ }
++
++function validateLuoguProblemId($str) {
++	return preg_match('/^(P|B)[1-9][0-9]{3,5}$/', $str);
++}
