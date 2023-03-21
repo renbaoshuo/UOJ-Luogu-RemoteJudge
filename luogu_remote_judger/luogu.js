@@ -31,7 +31,7 @@ const STATUS_MAP = [
   0,
   0,
   0,
-  'Judgment Failed',
+  'Judgement Failed',
   'Accepted',
   0,
   'Wrong Answer', // WA
@@ -160,7 +160,7 @@ export default class Luogu {
     if (HTTP_ERROR_MAP[result.status]) {
       await end({
         error: true,
-        status: 'Judgment Failed',
+        status: 'Judgement Failed',
         message: `[Luogu] ${HTTP_ERROR_MAP[result.status]}.`,
       });
 
@@ -187,7 +187,7 @@ export default class Luogu {
         if (HTTP_ERROR_MAP[result.status]) {
           await end({
             error: true,
-            status: 'Judgment Failed',
+            status: 'Judgement Failed',
             message: `[Luogu] ${HTTP_ERROR_MAP[result.status]}.`,
           });
 
@@ -207,7 +207,7 @@ export default class Luogu {
           return await end({
             error: true,
             id,
-            status: 'Judgment Failed',
+            status: 'Judgement Failed',
             message: 'Failed to fetch submission details.',
           });
         }
@@ -289,7 +289,7 @@ export default class Luogu {
     return await end({
       error: true,
       id,
-      status: 'Judgment Failed',
+      status: 'Judgement Failed',
       message: 'Failed to fetch submission details.',
     });
   }
@@ -354,7 +354,7 @@ export default class Luogu {
 
       await end({
         error: true,
-        status: 'Judgment Failed',
+        status: 'Judgement Failed',
         message: e.message,
       });
     }
