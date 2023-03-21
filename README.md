@@ -27,4 +27,6 @@
 **UOJ-Luogu-RemoteJudge** © [Baoshuo](https://github.com/renbaoshuo), Released under the [MIT](./LICENSE) License.<br>
 Authored and maintained by Baoshuo with help from [contributors](https://github.com/renbaoshuo/UOJ-Luogu-RemoteJudge/contributors).
 
+本模块在开发过程中得到了来自洛谷开发组和 HydroOJ 开发组的帮助，在此表示感谢。
+
 > [Personal Website](https://baoshuo.ren) · [Blog](https://blog.baoshuo.ren) · GitHub [@renbaoshuo](https://github.com/renbaoshuo) · Twitter [@renbaoshuo](https://twitter.com/renbaoshuo)
