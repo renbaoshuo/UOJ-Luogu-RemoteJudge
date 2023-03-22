@@ -65,8 +65,10 @@ insert into judger_info (judger_name, password) values ('luogu_remote_judger', '
 切换到 `luogu_remote_judger` 目录，运行以下命令：
 
 ```bash
-npm ci
+npm install
 ```
+
+_运行该命令时需要联网下载依赖，如果花费时间过长请更换 npm 镜像源。_
 
 之后使用以下命令启动桥接评测机（将 `_judger_password_` 修改为上方配置的密码）：
 
