@@ -199,7 +199,7 @@ export default class Luogu {
         const data = result.body.data;
 
         if (result.status == 204) {
-          await next({ status: '[Luogu] Judging' });
+          await next({ status: '[Luogu] Waiting' });
           continue;
         }
 
