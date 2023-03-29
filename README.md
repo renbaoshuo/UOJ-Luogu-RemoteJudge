@@ -18,6 +18,10 @@
 
 请查看 [INSTALLATION.md](./INSTALLATION.md)。
 
+## 使用帮助
+
+请查看 [USAGE.md](./USAGE.md)
+
 ## 常见问题
 
 请查看 [FAQ.md](./FAQ.md)。
